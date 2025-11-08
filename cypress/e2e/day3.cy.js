@@ -84,7 +84,7 @@ describe("Dynamic Controls", () => {
   });
 });
 
-describe.only("JS Alerts", () => {
+describe("JS Alerts", () => {
   beforeEach(() => {
     cy.visit("https://the-internet.herokuapp.com/javascript_alerts");
   });
@@ -122,5 +122,32 @@ describe.only("JS Alerts", () => {
     cy.contains("button", "Click for JS Prompt").click();
 
     cy.get("#result").should("contain", "You entered: Hello World");
+  });
+});
+
+describe("Drag and Drop", () => {
+  beforeEach(() => {
+    cy.visit("https://the-internet.herokuapp.com/drag_and_drop");
+  });
+  it("dragging one box onto the other and text changes", () => {
+    // cy.get("#column-a").trigger("mousedown", { which: 1 });
+    // cy.get("#column-b").trigger("mouseup", { force: true });
+    // cy.get("#column-b header").should("contain.text", "A");
+    const dataTransfer = new DataTransfer();
+
+    cy.get("#column-a").trigger("dragstart", { dataTransfer });
+
+    cy.get("#column-b").trigger("drop", { dataTransfer });
+
+    cy.get("#column-a").trigger("dragend", { dataTransfer });
+  });
+});
+describe.only("Test the visibility and functionality of a floating menu", () => {
+  beforeEach(() => {
+    cy.visit("https://the-internet.herokuapp.com/floating_menu");
+  });
+  it("Scroll down the page to ensure the menu is still visible", () => {
+    cy.scrollTo("bottom");
+    cy.get("#menu").should("be.visible");
   });
 });

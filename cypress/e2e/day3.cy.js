@@ -73,7 +73,7 @@ describe("Dynamic Controls", () => {
     cy.contains("button", "Add").click();
     cy.get("#checkbox").should("be.visible");
   });
-  it.only("Enter text in the disabled input field after clicking the Enable button", () => {
+  it("Enter text in the disabled input field after clicking the Enable button", () => {
     cy.contains("h4", "Dynamic Controls");
     cy.get("#input-example input").should("be.disabled");
     cy.contains("button", "Enable").click();
@@ -81,5 +81,46 @@ describe("Dynamic Controls", () => {
       .should("be.enabled")
       .type("Hello Cypress!")
       .should("have.value", "Hello Cypress!");
+  });
+});
+
+describe.only("JS Alerts", () => {
+  beforeEach(() => {
+    cy.visit("https://the-internet.herokuapp.com/javascript_alerts");
+  });
+  it("Click on the button to trigger a JS Alert ", () => {
+    cy.contains("button", "Click for JS Alert").click();
+    cy.on("window:alert", (txt) => {
+      expect(txt).to.equal("I am a JS Alert");
+      cy.get("#result").should("contain", "You successfully clicked an alert");
+    });
+  });
+  it("Handles confirm - OK - Click on the button to trigger a JS Confirm, accept it, and then verify the result message", () => {
+    cy.contains("button", "Click for JS Confirm").click();
+    cy.on("window:confirm", (txt) => {
+      expect(txt).to.equal("I am a JS Confirm");
+      return true; // <- press the OK button
+    });
+    cy.get("#result").should("contain", "You clicked: Ok");
+  });
+  it("Handles confirm - CANCEL", () => {
+    cy.contains("button", "Click for JS Confirm").click();
+    cy.on("window:confirm", (txt) => {
+      expect(txt).to.equal("I am a JS Confirm");
+      return false;
+    });
+    cy.get("#result").should("contain", "You clicked: Cancel");
+  });
+  it("Handles prompt input", () => {
+    //Cypress має спочатку замінити prompt, а потім викликати його.
+    // 1️⃣ Спочатку підміняємо window.prompt
+
+    cy.window().then((win) => {
+      cy.stub(win, "prompt").returns("Hello World");
+    });
+    // 2️⃣ Тепер клікаємо по кнопці, яка викличе prompt
+    cy.contains("button", "Click for JS Prompt").click();
+
+    cy.get("#result").should("contain", "You entered: Hello World");
   });
 });
